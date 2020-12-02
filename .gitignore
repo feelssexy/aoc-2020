@@ -1,0 +1,7 @@
+.*
+!.gitignore
+
+# https://github.com/github/gitignore/blob/master/Nim.gitignore
+nimcache/
+nimblecache/
+htmldocs/
