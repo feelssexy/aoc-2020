@@ -29,9 +29,7 @@ block puzzleTwo:
       # for j in 0..<m.groupsCount:
       #  echo m.group(j, i)
       if $m["password"][m["pos1"].parseInt-1] == m["letter"] xor $m["password"][m["pos2"].parseInt-1] == m["letter"]:
-        echo i
         inc valid
     else:
       quit i & " did not match"
-  echo "-----------"
   echo "Valid: ", valid
