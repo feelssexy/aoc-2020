@@ -1,3 +1,5 @@
+# !!! unfinished, fuck
+
 import strutils
 
 let text = open("C03.input").readAll().strip().split("\n")
@@ -8,44 +10,63 @@ let text = open("C03.input").readAll().strip().split("\n")
 #   for k, l in j:
 #     input[i].add l
 
-let input = text
+# let input = text
+let input = """..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#""".strip().split("\n")
 
 proc coord(x, y: int): char =
   var a: string
-  var substract: int
-  try:
-    if y < input.high:
-      a = input[y]
-    else:
-      return ' '
-    if x < a.high:
-      return a[x]
-    else:
-      # echo "oo"
-      var i = a.high
-      while i > 0:
-        if (x mod i) == 0:
-          substract = x
-          break
-        dec i
-      return a[x-substract]
-  except IndexDefect as e:
-    echo ' '
-    echo x, ' ', y
-    echo substract
-    raise e
+  if y < input.high:
+    a = input[y]
+  else:
+    return ' '
+  # if x < a.high:
+  if false:
+    return a[x]
+  else:
+    var i = x
+    var substract: int
+    while i > 0:
+      # if (i mod (a.len-1)) == 0:
+      if (i mod (a.len)) == 0:
+        substract = i
+        # echo substract
+        break
+      dec i
+    return a[x-substract]
 
 block puzzleOne:
-  var
-    x = 1
-    y = 1
+  var trees = 0
+  var x, y = 0
   while y <= len(input):
   # for i in 1..10:
-    # stdout.write coord(x, y); stdout.flushFile
-    echo coord(x, y), ' ', x, ' ', y
-    inc x, 1
-    inc y, 3
+    if coord(x, y) == '#':
+      inc trees
+    var substract: int
+    block:
+      var i = x
+      while i > 0:
+        # if (i mod (a.len-1)) == 0:
+        if (i mod 11) == 0:
+          substract = i
+          # echo substract
+          break
+        dec i
+    stdout.write coord(x, y); stdout.flushFile
+    #echo coord(x, y), ' ', x, ' ', y, ' ', substract
+    inc x, 3
+    inc y, 1
   echo ""
+  echo trees
 
 # for i in input:
 #   for j in i:
