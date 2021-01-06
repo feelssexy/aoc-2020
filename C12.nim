@@ -1,7 +1,7 @@
 import strformat, regex, strutils
 
-#include inputloader
-let input = @["F10", "N3", "F7", "R90", "F11"]
+include inputloader
+#let input = @["F10", "N3", "F7", "R90", "F11"]
 
 # stupid doesnt work
 #const r_expr = re"""(?x)
@@ -44,16 +44,6 @@ type Instruction = enum
   left, right
   forward
 
-proc funny(a: tuple[funny: int]): int = 2
-proc funny(a: tuple[a: int]): int = 3
-
-var d = (funny: 1)
-echo d.funny()
-#inc d
-#echo d
-
-quit 0
-
 for line in input:
   var m: RegexMatch
   assert match(line, r_expr, m)
@@ -78,22 +68,49 @@ block puzzleOne: # quick and 'dirty'
       position.x -= n
     else:
       assert false, &"instruction '{instruction}' cannot exist, I ignorantly deny its existance... look at all the unfacutal proof"
+  #proc turnShip(f: var {'N', 'E', 'S', 'W'}, n: int) =
+  proc turnShip(f: var char, n: int) =
+    var i = n
+    const cycle = "NESW"
+    #while i > 270: # 90 * 4 - 90
+    #  assert false, $i
+    #  i -= 90
+    i = (i / 90).int
+    i += cycle.find(f)
+    while i > 3:
+      echo "aa"
+      i -= 4
+    while i < 0:
+      echo "bb"
+      i += 4
+    if i >= 0:
+      f = cycle[i]
+    else:
+      #inc i, 2
+      #echo "fucked"
+      #echo cycle
+      #echo i
+      #echo cycle[^i]
+      f = cycle[^i]
+  template ass =
+    assert (number mod 90) == 0, &"instruction: {instruction}, number: {number}"
   var facing: char = 'E'
-  var m: RegexMatch
   var position = (x: 0, y: 0)
   for line in input:
-
     let instruction = line[0]
     let number = line[1..^1].parseInt
     case instruction
     of 'F':
       parseDirection(position, facing, number)
     of 'R':
-      assert (number mod 90) == 0, &"instruction: {instruction}, number: {number}"
-
+      ass()
+      facing.turnShip(number)
     of 'L':
-      discard
+      ass()
+      facing.turnShip(-number)
     else:
-      parseDirection(position, facing, number)
+      parseDirection(position, instruction, number)
+    echo &"{instruction}{number}{' '.repeat(3 - len($number))}: ({position.x}, {position.y})  F: {facing}"
   echo &"Ship's Position: ({position.x}, {position.y})"
+  echo &"Manhattan's Distance: {abs(position.x) + abs(position.y)}"
       
