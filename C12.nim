@@ -56,6 +56,7 @@ for line in input:
 #    assert match(line, r_expr, m)
 
 block puzzleOne: # quick and 'dirty'
+  echo "Part 1"
   template parseDirection(position: var typed, a: char, n: int) =
     case a
     of 'N':
@@ -68,13 +69,11 @@ block puzzleOne: # quick and 'dirty'
       position.x -= n
     else:
       assert false, &"instruction '{instruction}' cannot exist, I ignorantly deny its existance... look at all the unfacutal proof"
-  #proc turnShip(f: var {'N', 'E', 'S', 'W'}, n: int) =
   proc turnShip(f: var char, n: int) =
-    var i = n
     const cycle = "NESW"
-    #while i > 270: # 90 * 4 - 90
-    #  assert false, $i
-    #  i -= 90
+    assert f in cycle, "Only valid options are " & cycle[0..^2].join(", ") & " and " & cycle[^1]
+    assert n mod 90 == 0, "Must be dividable by 90"
+    var i = n
     i = (i / 90).int
     i += cycle.find(f)
     while i > 3:
@@ -86,14 +85,7 @@ block puzzleOne: # quick and 'dirty'
     if i >= 0:
       f = cycle[i]
     else:
-      #inc i, 2
-      #echo "fucked"
-      #echo cycle
-      #echo i
-      #echo cycle[^i]
       f = cycle[^i]
-  template ass =
-    assert (number mod 90) == 0, &"instruction: {instruction}, number: {number}"
   var facing: char = 'E'
   var position = (x: 0, y: 0)
   for line in input:
@@ -103,14 +95,49 @@ block puzzleOne: # quick and 'dirty'
     of 'F':
       parseDirection(position, facing, number)
     of 'R':
-      ass()
       facing.turnShip(number)
     of 'L':
-      ass()
       facing.turnShip(-number)
     else:
       parseDirection(position, instruction, number)
-    echo &"{instruction}{number}{' '.repeat(3 - len($number))}: ({position.x}, {position.y})  F: {facing}"
+    #echo &"{instruction}{number}{' '.repeat(3 - len($number))}: ({position.x}, {position.y})  F: {facing}"
   echo &"Ship's Position: ({position.x}, {position.y})"
   echo &"Manhattan's Distance: {abs(position.x) + abs(position.y)}"
-      
+
+block puzzleTwo:
+  echo "Part 2"
+  template parseDirection(position: var typed, a: char, n: int) =
+    case a
+    of 'N':
+      position.y -= n
+    of 'E':
+      position.x += n
+    of 'S':
+      position.y += n
+    of 'W':
+      position.x -= n
+    else:
+      assert false, &"instruction '{instruction}' cannot exist, I ignorantly deny its existance... look at all the unfacutal proof"
+  var waypointPos = (x: 10, y: -1)
+  var shipPos = (x: 0, y: 0)
+  for line in input:
+    let instruction = line[0]
+    let number = line[1..^1].parseInt
+    case instruction
+    of 'F':
+      shipPos.x += waypointPos.x * number
+      shipPos.y += waypointPos.y * number
+    of 'R':
+      assert number mod 90 == 0
+      for i in 1..(number/90).int:
+        (waypointPos.x, waypointPos.y) = (-waypointPos.y, waypointPos.x)
+        #(waypointPos.x, waypointPos.y) = (-waypointPos.y, -waypointPos.x)
+    of 'L':
+      assert number mod 90 == 0
+      for i in 1..(number/90).int:
+        (waypointPos.x, waypointPos.y) = (waypointPos.y, -waypointPos.x)
+    else:
+      parseDirection(waypointPos, instruction, number)
+    #echo &"{instruction}{number}{' '.repeat(3 - len($number))}: W({waypointPos.x}, {waypointPos.y}) S({shipPos.x}, {shipPos.y})"#  F: {facing}"
+  echo &"Ship's Position: ({shipPos.x}, {shipPos.y})"
+  echo &"Manhattan's Distance: {abs(shipPos.x) + abs(shipPos.y)}"
